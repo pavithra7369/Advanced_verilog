@@ -432,13 +432,17 @@ The phases for questa sim simulation process is
 Phase1:Library creation
 
 > vlib <library_name>
+
 > vlib logical_library_name_library_name
 
 Phase2: Compilation
 
 > $vlog - work library_name path_to_rtl_files
+
 > $vlog - work library_name path_to_tb_files
+
 > vlog design.v
+
 > vlog testbench.v
 
 Phase3: Simulation and Elaboration
@@ -447,12 +451,16 @@ Phase3: Simulation and Elaboration
 
 ### for code coverage
 * Phase1:
+  
 > vlib <library_name>
+
 > vlib logical_library_name_library_name
 
 * Phase2:
+  
   > vlog -work library_name -coveropt 3 +cover +acc path_to_rtl_files
   path_to_tb_files
+  
   +cover: Enables the code coverage metrics to cover "bcefts" coverage.
   -coveropt 3:will set the optimization level to 3.
   +acc: It enables access to a specific design unit when optimization level is 
@@ -461,14 +469,18 @@ Phase3: Simulation and Elaboration
 * Phase3:
   > $vsim -coverage -vopt library.TB_module_name -c -do "coverage save -
   onexit -directive -codeAll file1;run -all;exit"
+  
   > coverage save -onexit  -codeAll file1 saves all coverage types results to the 
   file during end of simulation.
+  
   > -codeAll means -codebcefst
 
 * Phase4: Generate coverage report
+  
   > vcover report -details -codeAll -html file1
 
 * Phase5: Display the reposrt through web browser
+  
   > firefox covhtmlreport/index.html&
 
 ### Makefile for simulations
@@ -481,70 +493,98 @@ Phase3: Simulation and Elaboration
 * targets-->compilation, simulation, remove certain files, clean up operation
 
 * create a make file
+  
   > $vi Makefile or $vi makefile  // create a makefile
+  
   > $make target_name // execute a make file
 
 * Questasim commands for simulation using makefile
+  
   #Makefile
+  
   #variables
+  
   RTL= ../rtl# Top module name
+  
   mux=mux  #Logical/physical library name
+  
   TB= #testbench file
+  
   VSIMBATCH= -c -do "run -all;exit"
-  #targets <name>: 
+  
+  #targets <name>:
+  
 lib:
-    vlib$(work)
-    vmap work $(work)
+
+   vlib$(work)
+   vmap work $(work)
+   
 cmp:
    vlog -work$(work) $(RTL) $(TB)
+   
 run_sim:
       vsim -vopt $(VSIMBATCH)mux.mux4_tb
+      
 clean:
      rm -f modelsim.ini transcript
      rm -rf $(work)
      clear
+     
 comp:
      lib cmp
+     
 run_all:
         clean lib cmp run_sim
 
 
 
+### for code coverage
 
-
-# Variables
+ 
 RTL = ../rtl/*.v
+
 LIB = coin
+
 COVOP = -coveropt 3 +cover +acc
+
 TB = ../tb/tb_coincol.v
+
 VSIMOPT = -coverage -vopt coin.tb_coincol
+
 VSIMCOV = coverage save -onexit -codeAll coincov
+
 VSIMBATCH = -c -do "$(VSIMCOV); run -all; exit"
 
-# Create the library
+ Create the library
+ 
 lib:
 	vlib $(LIB)
-	vmap work $(LIB)
+       vmap work $(LIB)
 
-# Compile and simulate
+Compile and simulate
 run_tb:
 	vlog -work $(LIB) $(COVOP) $(RTL) $(TB)
 	vsim $(VSIMOPT) $(VSIMBATCH)
 
-# Generate coverage report
+ Generate coverage report
+ 
 report:
 	vcover report -details -codeAll -html coincov
 
-# Open coverage report in Firefox
+ Open coverage report in Firefox
+ 
 html:
 	firefox covhtmlreport/index.html&
 
-# Full run: clean, create lib, run testbench, generate report, and open HTML report
+Full run: clean, create lib, run testbench, generate report, and open HTML report
+
 runl: clean lib run_tb report html
 
-# Clean generated files
+ Clean generated files
+ 
 clean:
 	rm -rf modelsim.ini transcript cov* coincov
 	rm -rf $(LIB)
+
 
  * make files are used for automation
